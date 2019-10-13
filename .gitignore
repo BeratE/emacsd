@@ -1,0 +1,17 @@
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+session*
+
+# Other directories
+elpa
+snippets
+request
+
+projectile-bookmarks.eld
