@@ -19,7 +19,7 @@
  '(ein:polymode t)
  '(package-selected-packages
    (quote
-    (cmake-mode company-rtags cmake-ide rtags clang-format company-c-headers sr-speedbar w3m slime-company smartparens slime ctags-update projectile ein elpy yasnippet-classic-snippets web-mode php-auto-yasnippets pdf-tools lua-mode gnuplot-mode gnuplot flycheck auctex)))
+    (multicolumn cmake-mode company-rtags cmake-ide rtags clang-format company-c-headers sr-speedbar w3m slime-company smartparens slime ctags-update projectile ein elpy yasnippet-classic-snippets web-mode php-auto-yasnippets pdf-tools lua-mode gnuplot-mode gnuplot flycheck auctex)))
  '(sp-base-key-bindings (quote sp)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -42,7 +42,6 @@
 
 ;; Bug in Emacs (Bad Request)
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
 
 ;;;
 ;;; Custom functions and global Keybindings
@@ -86,6 +85,7 @@
 (require 'flycheck)
 (add-hook 'after-init-hook 'global-flycheck-mode)
 
+
 ;; Yassnippet
 (require 'yasnippet)
 
@@ -97,18 +97,14 @@
 (cmake-ide-setup)
 (setq cmake-ide-flags-c++ (append '("-std=c++11")))
 
-; Local Cmake Bindings
-(add-hook 'c++-mode-hook (lambda () (local-set-key (kbd "<f5>") 'cmake-ide-compile)))
-
 ;; RTags Config
 (setq rtags-autostart-diagnostics t)
 (rtags-diagnostics)
 (setq rtags-completions-enabled t)
 (rtags-enable-standard-keybindings)
-(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
-(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-(add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
+;(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+;(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+;(add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
 
 (require 'company-rtags)
 (setq rtags-completions-enabled t)
