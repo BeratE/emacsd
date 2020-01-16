@@ -19,7 +19,7 @@
  '(ein:polymode t)
  '(package-selected-packages
    (quote
-    (multicolumn cmake-mode company-rtags cmake-ide rtags clang-format company-c-headers sr-speedbar w3m slime-company smartparens slime ctags-update projectile ein elpy yasnippet-classic-snippets web-mode php-auto-yasnippets pdf-tools lua-mode gnuplot-mode gnuplot flycheck auctex)))
+    (multiple-cursors multicolumn cmake-mode company-rtags cmake-ide rtags clang-format company-c-headers sr-speedbar w3m slime-company smartparens slime ctags-update projectile ein elpy yasnippet-classic-snippets web-mode php-auto-yasnippets pdf-tools lua-mode gnuplot-mode gnuplot flycheck auctex)))
  '(sp-base-key-bindings (quote sp)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -159,5 +159,8 @@
 (add-hook 'after-init-hook #'smartparens-mode)
 
 (require 'cmake-mode)
+
+;; GDB
+(setq gdb-many-windows t)
 
 ;;; init ends here
