@@ -6,58 +6,12 @@
 ;;; Code:
 ;;;
 
-(custom-set-variables
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
- '(beacon-color "#f2777a")
- '(custom-enabled-themes (quote (tsdh-dark)))
- '(custom-safe-themes (quote
-                       ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a"
-                        "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d"
-                        "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58"
-                        "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e"
-                        "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" default)))
- '(fci-rule-color "#515151")
- '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
- '(frame-background-mode (quote dark))
- '(package-selected-packages
-   (quote (color-theme-sanityinc-tomorrow multiple-cursors multicolumn
-           cmake-mode company-rtags cmake-ide rtags clang-format company-c-headers sr-speedbar
-           w3m slime-company smartparens slime ctags-update projectile ein elpy yasnippet-classic-snippets
-           web-mode php-auto-yasnippets pdf-tools lua-mode gnuplot-mode gnuplot flycheck auctex)))
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#f2777a")
-     (40 . "#f99157")
-     (60 . "#ffcc66")
-     (80 . "#99cc99")
-     (100 . "#66cccc")
-     (120 . "#6699cc")
-     (140 . "#cc99cc")
-     (160 . "#f2777a")
-     (180 . "#f99157")
-     (200 . "#ffcc66")
-     (220 . "#99cc99")
-     (240 . "#66cccc")
-     (260 . "#6699cc")
-     (280 . "#cc99cc")
-     (300 . "#f2777a")
-     (320 . "#f99157")
-     (340 . "#ffcc66")
-     (360 . "#99cc99"))))
- '(vc-annotate-very-old-color nil)
- '(window-divider-mode nil))
-(custom-set-faces
- '(default ((t (:family "Source Code Pro" :foundry "ADBO" :slant normal
-                :weight semi-bold :height 98 :width normal)))))
-
-
 ;;;
 ;;; Default Behaviour
 ;;;
+
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
 
 ;(setq inhibit-startup-screen t)
 (setq column-number-mode t)
@@ -121,8 +75,9 @@
 (setq speedbar-show-unknown-files t)
 
 ;; Smartparens
-(require 'smartparens)
+(require 'smartparens-config)
 (add-hook 'after-init-hook 'smartparens-mode)
+(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
 
 ;; GDB
 (setq gdb-many-windows t)
@@ -164,6 +119,7 @@
 
 ;; Slime
 (require 'slime)
+(load "~/quicklisp/clhs-use-local.el" t)
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "/usr/bin/sbcl")
 (add-hook 'lisp-mode-hook #'slime-mode)
@@ -172,16 +128,17 @@
 ;;; Custom Mode Hooks and Configurations
 ;;;
 
-(defun my-c-mode-common-hook ()
-  "Customizations for all of c-mode and related modes."
+(defun my-c-mode-hook ()
   ;; Default behaviour
-  (setq-default c-basic-offset 4)
+  (setq c-default-style "linux"
+        c-basic-offset 4)
   ;; Company C Headers
+  (setq company-c-headers-path-system '("/usr/include/c++/9.2.0" "/usr/include" "/usr/local/include"))
   (add-to-list 'company-backends 'company-c-headers)
   ;; RTags
   (require 'rtags)
   (require 'company-rtags)
-  (require 'flycheck-rtags)
+  ;(require 'flycheck-rtags)
   (setq rtags-autostart-diagnostics t)
   (setq rtags-completions-enabled t)
   (rtags-enable-standard-keybindings)
@@ -189,20 +146,14 @@
   (setq rtags-completions-enabled t)
   (push 'company-rtags company-backends)
   ;; Setup Rtags flycheck for better experience
-  (flycheck-select-checker 'rtags)
-  (setq-local flycheck-check-syntax-automatically nil)
-  (setq-local flycheck-highlighting-mode nil)
+  ;(setq flycheck-check-syntax-automatically nil)
+  ;(setq flycheck-highlighting-mode nil)
+  ;(flycheck-select-checker 'rtags)
   ;; CMake IDE
   (cmake-ide-setup)
-  (rtags-start-process-unless-running)
-  )
+  (rtags-start-process-unless-running))
 
-(defun my-lisp-mode-hook ()
-  ;;; Offline Common Lisp Hyperspec
-  (load "~/quicklisp/clhs-use-local.el" t)
-  )
-
-(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-(add-hook 'slime-lisp-mode-hook 'my-lisp-mode-hook)
+(add-hook 'c-mode-common-hook 'my-c-mode-hook)
 
 ;;; init ends here
+3
