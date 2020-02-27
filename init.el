@@ -22,19 +22,9 @@
 ;; Bug in Emacs (Bad Request)
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
-;;;
-;;; Custom functions and global keybindings
-;;;
-
-(defun toggle-text-fold (&optional level)
-  "Fold text indented by LEVEL."
-  (interactive "P")
-  (if (eq selective-display (1+ (current-column)))
-      (set-selective-display 0)
-    (set-selective-display (or level (1+ (current-column))))))
-
-(global-set-key (kbd "<f2>") #'sr-speedbar-toggle)
-(global-set-key (kbd "<f3>") #'toggle-text-fold)
+;; Optimization
+(setq gc-cons-threshold 100000000 ;  100mb
+      read-process-output-max (* 1024 1024)) ; 1 mb
 
 ;;;
 ;;; Package Settings
@@ -53,14 +43,20 @@
 ;;; Global Modes
 ;;;
 
+;; Which-key
+(require 'which-key)
+(which-key-mode)
+
 ;; Projectile
 (require 'projectile)
 (projectile-mode t)
-(define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;; Company
 (require 'company)
 (add-hook 'after-init-hook 'global-company-mode)
+(setq company-minimum-prefix-length 1
+      company-idle-delay 0.0)
 
 ;; Flycheck
 (require 'flycheck)
@@ -77,7 +73,19 @@
 ;; Smartparens
 (require 'smartparens-config)
 (add-hook 'after-init-hook 'smartparens-mode)
-(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+
+;; LSP
+(setq lsp-keymap-prefix "C-c l")
+(require 'lsp-mode)
+(add-hook 'prog-mode-hook #'lsp)
+(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+;; Note: Clang looks for compile_commands.json in project root folder
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+
+;; Company-LSP
+(require 'company-lsp)
+(push 'company-lsp company-backends)
 
 ;; GDB
 (setq gdb-many-windows t)
@@ -125,35 +133,32 @@
 (add-hook 'lisp-mode-hook #'slime-mode)
 
 ;;;
+;;; Custom functions and global keybindings
+;;;
+
+(defun toggle-text-fold (&optional level)
+  "Fold text indented by LEVEL."
+  (interactive "P")
+  (if (eq selective-display (1+ (current-column)))
+      (set-selective-display 0)
+    (set-selective-display (or level (1+ (current-column))))))
+
+(global-set-key (kbd "<f2>") #'sr-speedbar-toggle)
+(global-set-key (kbd "<f3>") #'toggle-text-fold)
+
+;;;
 ;;; Custom Mode Hooks and Configurations
 ;;;
 
 (defun my-c-mode-hook ()
+  "C-Style specific properties."
   ;; Default behaviour
   (setq c-default-style "linux"
         c-basic-offset 4)
   ;; Company C Headers
   (setq company-c-headers-path-system '("/usr/include/c++/9.2.0" "/usr/include" "/usr/local/include"))
-  (add-to-list 'company-backends 'company-c-headers)
-  ;; RTags
-  (require 'rtags)
-  (require 'company-rtags)
-  ;(require 'flycheck-rtags)
-  (setq rtags-autostart-diagnostics t)
-  (setq rtags-completions-enabled t)
-  (rtags-enable-standard-keybindings)
-  ;; Setup rtags company backend
-  (setq rtags-completions-enabled t)
-  (push 'company-rtags company-backends)
-  ;; Setup Rtags flycheck for better experience
-  ;(setq flycheck-check-syntax-automatically nil)
-  ;(setq flycheck-highlighting-mode nil)
-  ;(flycheck-select-checker 'rtags)
-  ;; CMake IDE
-  (cmake-ide-setup)
-  (rtags-start-process-unless-running))
+  (add-to-list 'company-backends 'company-c-headers))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-hook)
 
 ;;; init ends here
-3

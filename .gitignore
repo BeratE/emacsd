@@ -8,6 +8,7 @@ auto-save-list
 tramp
 .\#*
 session*
+.lsp*
 
 # Other directories
 elpa
