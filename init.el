@@ -13,9 +13,11 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-;(setq inhibit-startup-screen t)
-(setq column-number-mode t)
-(setq indent-tabs-mode nil)
+(setq inhibit-startup-screen t
+      indent-tabs-mode nil)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(column-number-mode t)
 (show-paren-mode t)
 (global-linum-mode t)
 
@@ -34,9 +36,12 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'load-path "~/.emacs.d/elpa")
-(let ((default-directory  "~/.emacs.d/lisp/"))
+;; Third party elisp files
+;; Add all subdirs contained in the following directory
+(let ((default-directory  "~/.emacs.d/site-lisp/"))
   (normal-top-level-add-to-load-path '("."))
   (normal-top-level-add-subdirs-to-load-path))
+
 (package-initialize)
 
 ;;;
@@ -64,7 +69,14 @@
 
 ;; Yassnippet
 (require 'yasnippet)
-(add-hook 'after-init-hool 'yas-global-mode)
+(require 'yasnippet-snippets)
+(yas-global-mode 1)
+
+
+;; undo-tree
+(require 'undo-tree)
+(undo-tree-mode)
+(global-set-key (kbd "M-/") 'undo-tree-visualize)
 
 ;; sr-speedbar
 (require 'speedbar)
@@ -77,6 +89,7 @@
 ;; LSP
 (setq lsp-keymap-prefix "C-c l")
 (require 'lsp-mode)
+(setq lsp-enable-indentation nil) ; messes up my config
 (add-hook 'prog-mode-hook #'lsp)
 (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
 ;; Note: Clang looks for compile_commands.json in project root folder
@@ -125,12 +138,31 @@
 (add-to-list 'auto-mode-alist '("\\.html\\.twig\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
+;; Org-mode settings
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(setq org-log-done t)
+; Babel in org-mode
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (ipython . t)
+   (shell . t)))
+(setq org-src-fontify-natively t)
+(setq org-confirm-babel-evaluate nil)
+(setq ob-async-no-async-languages-alist '("ipython"))
+
 ;; Slime
 (require 'slime)
 (load "~/quicklisp/clhs-use-local.el" t)
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "/usr/bin/sbcl")
 (add-hook 'lisp-mode-hook #'slime-mode)
+
+;; Assembler
+(require 'rgbds-mode)
+(add-to-list 'auto-mode-alist '("\\.inc\\'" . asm-mode))
 
 ;;;
 ;;; Custom functions and global keybindings
@@ -150,11 +182,13 @@
 ;;; Custom Mode Hooks and Configurations
 ;;;
 
+
+
 (defun my-c-mode-hook ()
   "C-Style specific properties."
   ;; Default behaviour
-  (setq c-default-style "linux"
-        c-basic-offset 4)
+  (c-set-style "linux")
+  (setq c-basic-offset 4)
   ;; Company C Headers
   (setq company-c-headers-path-system '("/usr/include/c++/9.2.0" "/usr/include" "/usr/local/include"))
   (add-to-list 'company-backends 'company-c-headers))
