@@ -44,7 +44,6 @@
 
 (use-package org)
 
-  ;; Org-mode #+setupfile: tings
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (global-set-key "\C-c l" 'org-store-link)
 (global-set-key "\C-c a" 'org-agenda)
@@ -59,6 +58,7 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
+   (ipython . t)
    (C . t)
    (calc . t)
    (latex . t)
@@ -77,6 +77,7 @@
   (not (or (string= lang "C")
            (string= lang "java")
            (string= lang "python")
+           (string= lang "ipython")
            (string= lang "emacs-lisp")
            (string= lang "sqlite"))))
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
@@ -106,48 +107,27 @@
 
 (use-package projectile
   :ensure t
-  :diminish projectile-mode
-  :commands (projectile-mode projectile-switch-project)
-  :bind (("C-c p p" . projectile-switch-project)
-         ("C-c p s s" . projectile-ag)
-         ("C-c p s r" . projectile-ripgrep))
   :config
-  (setq projectile-keymap-prefix (kbd "C-c p"))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-global-mode t)
   (setq projectile-enable-caching t))
 
 (use-package helm
-  :disabled t
   :ensure t
-  :diminish helm-mode
   :bind (("C-c h" . helm-command-prefix)
-	 ("C-x b" . helm-mini)
-	 ("C-`" . helm-resume)
-	 ("M-x" . helm-M-x)
-	 ("C-x C-f" . helm-find-files)
-	 ("C-x C-r" . helm-recentf))
+         ("M-x" . helm-M-x))
   :init
   (require 'helm-config)
   :config
-  (setq helm-locate-command "mdfind -interpret -name %s %s"
-	helm-ff-newfile-prompt-p nil
-	helm-M-x-fuzzy-match t)
-  (helm-mode)
+  (helm-mode 1)
   (set-face-attribute 'helm-source-header nil :height 0.1)
   (helm-autoresize-mode 1)
-  (setq helm-display-header-line nil)
-  (setq helm-autoresize-max-height 30)
-  (setq helm-autoresize-min-height 30))
-
-(use-package helm-projectile
-  :ensure t
-  :after helm-mode
-  :commands helm-projectile
-  :bind ("C-c p h" . helm-projectile))
+  (setq helm-display-header-line nil
+        helm-autoresize-max-height 30
+        helm-autoresize-min-height 20))
 
 (use-package flycheck
   :ensure t
-  :diminish flycheck-mode
   :defer 10
   :config 
   (setq flycheck-html-tidy-executable "tidy5")
@@ -155,7 +135,6 @@
 
 (use-package yasnippet
   :ensure t
-  :diminish yas-minor-mode
   :config
   (add-to-list 'yas-snippet-dirs (locate-user-emacs-file "snippets"))
   (setq yas-indent-line 'fixed)
@@ -163,19 +142,18 @@
 
 (use-package company
   :ensure t
-  :diminish company-mode
   :config
-  (setq company-tooltip-limit 20)
-  (setq company-idle-delay .15)
-  (setq company-echo-delay 0)
+  (setq company-minimum-prefix-length 1
+        company-idle-delay 0.0)
   (setq company-begin-commands '(self-insert-command))
   (define-key company-active-map (kbd "C-n") #'company-select-next)
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
   (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package undo-tree
-  :diminish undo-tree-mode
-  :bind (("M-/" . undo-tree-visualize)))
+  :bind (("M-/" . undo-tree-visualize))
+  :config 
+  (undo-tree-mode))
 
 (use-package sr-speedbar
   :ensure t
@@ -185,25 +163,42 @@
 (require 'smartparens-config)
 (setq smartparens-global-mode t)
 
-(use-package ccls
-  :init
-  (setq ccls-executable "/home/berat/aur/ccls/Release/ccls")
-  :config
-  (setq lsp-prefer-flymake nil)
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
-
 (use-package lsp-mode
-  :ensure ccls
-  :hook prog-mode
-  :bind (("C-c l" . lsp-keymap-prefix))
+  :ensure t
+  :hook ((prog-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration))
+  :custom
+  (lsp-keymap-prefix "C-c l")
   :config
-  (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
-  (setq lsp-enable-indentation nil)
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+  (setq lsp-enable-indentation nil))
+
+(use-package lsp-ui 
+  :ensure t
+  :commands lsp-ui-mode)
+
+(use-package company-lsp
+  :ensure t
+  :commands company-lsp
+  :config (push 'company-lsp company-backends))
 
 ;; Company-LSP
 (require 'company-lsp)
 (push 'company-lsp company-backends)
+
+(use-package ccls
+  :after projectile
+  :hook ((c-mode c++-mode objc-mode) .
+         (lambda () (require 'ccls)))
+  :custom
+  (ccls-args nil)
+  (ccls-executable "/home/berat/aur/ccls/Release/ccls")
+  (lsp-prefer-flymake nil)
+  (projectile-project-root-files-top-down-recurring
+   (append '("compile_commands.json" ".ccls")
+           projectile-project-root-files-top-down-recurring))
+  :config 
+  (push ".ccls-cache" projectile-globally-ignored-directories)
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
 (use-package tex
   :ensure auctex

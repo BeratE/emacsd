@@ -19,3 +19,5 @@ url
 projectile-bookmarks.eld
 bookmarks
 elpy
+*.cache
+recentf
