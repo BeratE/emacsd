@@ -21,3 +21,5 @@ bookmarks
 elpy
 *.cache
 recentf
+compile_commands.json
+settings.el

@@ -84,11 +84,11 @@
 
 (setq ob-async-no-async-languages-alist '("ipython"))
 
-(setq org-src-fontify-natively t
-      org-src-window-setup 'current-window
-      org-src-strip-leading-and-trailing-blank-lines t
-      org-src-preserve-indentation t
-      org-src-tab-acts-natively t)
+  (setq org-src-fontify-natively t
+	org-src-window-setup 'current-window
+	org-src-strip-leading-and-trailing-blank-lines t
+	org-src-preserve-indentation t
+	org-src-tab-acts-natively t)
 
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
@@ -115,16 +115,22 @@
 (use-package helm
   :ensure t
   :bind (("C-c h" . helm-command-prefix)
-         ("M-x" . helm-M-x))
-  :init
-  (require 'helm-config)
+         ("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-h a" . helm-apropos)
+         ("C-h d" . helm-info-at-point))
+  :custom 
+  (helm-split-window-default-side) 
+  (helm-split-window-inside-p t)
+  (helm-swoop-split-with-multiple-windows t)
+  (helm-display-header-line nil)
+  (helm-autoresize-max-height 30)
+  (helm-autoresize-min-height 20)
   :config
+  (require 'helm-config)              ; required to setup "s-c" keymap
   (helm-mode 1)
-  (set-face-attribute 'helm-source-header nil :height 0.1)
   (helm-autoresize-mode 1)
-  (setq helm-display-header-line nil
-        helm-autoresize-max-height 30
-        helm-autoresize-min-height 20))
+  (set-face-attribute 'helm-source-header nil :height 0.1))
 
 (use-package flycheck
   :ensure t
@@ -180,10 +186,6 @@
   :ensure t
   :commands company-lsp
   :config (push 'company-lsp company-backends))
-
-;; Company-LSP
-(require 'company-lsp)
-(push 'company-lsp company-backends)
 
 (use-package ccls
   :after projectile
