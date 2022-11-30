@@ -1,0 +1,294 @@
+#+title:  Emacs configuration file
+#+author: Berat Ertural
+#+date:   2021-08-06
+
+* Custom Look and Feel 
+** Personal Information
+This is me!
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Berat Ertural"
+        user-mail-address "beertural+git@gmail.com")
+#+END_SRC
+
+** Default Behaviour
+Lets have some sane defaults, shall we?
+
+#+BEGIN_SRC emacs-lisp
+  ;; Optimization
+  (setq gc-cons-threshold 100000000 ;  100mb
+        read-process-output-max (* 1024 1024)) ; 1 mb
+  
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  
+  ;; Keep all backup and auto-save files in one directory
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+  
+  ;; UTF-8 encoding
+  (set-language-environment "UTF-8")
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+  
+  (setq-default indent-tabs-mode nil
+                indicate-empty-lines t)
+  
+  ;; Enable Minor Modes
+  (ido-mode 1)
+  (ido-everywhere)
+  (setq ido-enable-flex-matching t)
+  (tool-bar-mode -1)
+  ;(menu-bar-mode -1)
+  (show-paren-mode t)
+  (global-linum-mode t)
+  (column-number-mode t)
+  (delete-selection-mode t)
+  (global-visual-line-mode)
+  
+  (setq-default indent-tabs-mode nil
+                tab-width 4)
+  
+  ;; Global Keys
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "C-c w") 'whitespace-mode)
+  (global-set-key (kbd "RET") 'newline-and-indent)
+#+END_SRC
+  
+** Style
+*** Theme 
+Tango-dark is comfy. 
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'tango-dark t)
+#+END_SRC
+
+*** Font   
+Smexy fonts ^3^
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "Fira Code-10"))
+  (set-face-attribute 'default t :font "Fira Code-10")
+
+  ;; Font Ligatures
+  ; Enable the www ligature in every possible major mode
+  (require 'ligature)
+  (ligature-set-ligatures 't '("www"))
+
+  ; Enable ligatures in programming modes                                                           
+  (ligature-set-ligatures 'prog-mode '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                                       ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                                       "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                                       "#_(" ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*" "/**"
+                                       "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                                       "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                                       "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                                       "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                                       "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                                       "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%"))
+
+  ;(global-ligature-mode 't)
+#+END_SRC
+
+* Navigation and Help
+** Which-key
+Handy if you forget the specific keybindings. You only need to remember the mode-map key.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+END_SRC  
+
+* Text Editing
+** Custom 
+
+#+BEGIN_SRC emacs-lisp
+  (defun increment-number-at-point ()
+    (interactive)
+    (skip-chars-backward "0-9")
+    (or (looking-at "[0-9]+")
+        (error "No number at point"))
+    (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+
+  (global-set-key (kbd "C-c +") 'increment-number-at-point)
+
+#+END_SRC
+
+** Outline
+#+BEGIN_SRC emacs-lisp
+  ; Outline-minor-mode key map
+  (define-prefix-command 'cm-map nil "Outline-")
+                                          ; HIDE
+  (define-key cm-map "q" 'hide-sublevels); Hide everything but the top-level headings
+  (define-key cm-map "t" 'hide-body)     ; Hide everything but headings (all body lines)
+  (define-key cm-map "o" 'hide-other)    ; Hide other branches
+  (define-key cm-map "c" 'hide-entry)    ; Hide this entry's body
+  (define-key cm-map "l" 'hide-leaves)   ; Hide body lines in this entry and sub-entries
+  (define-key cm-map "d" 'hide-subtree)  ; Hide everything in this entry and sub-entries
+                                          ; SHOW
+  (define-key cm-map "a" 'show-all)      ; Show (expand) everything
+  (define-key cm-map "e" 'show-entry)    ; Show this heading's body
+  (define-key cm-map "i" 'show-children) ; Show this heading's child sub-headings
+  (define-key cm-map "k" 'show-branches) ; Show all sub-headings under this heading
+  (define-key cm-map "s" 'show-subtree)  ; Show everything in this heading & below
+                                          ; MOVE
+  (define-key cm-map "u" 'outline-up-heading)                ; Up
+  (define-key cm-map "n" 'outline-next-visible-heading)      ; Next
+  (define-key cm-map "p" 'outline-previous-visible-heading)  ; Previous
+  (define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same level
+  (define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same level
+  (global-set-key "\M-o" cm-map)
+#+END_SRC  
+** Org-mode
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook 'flyspell-mode)
+  (setq org-startup-numerated t)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+
+  (setq org-latex-pdf-process
+        (let
+            ((cmd (concat "pdflatex -shell-escape -interaction nonstopmode"
+                          " --synctex=1"
+                          " -output-directory %o %f")))
+          (list cmd
+                "cd %o; if test -r %b.idx; then makeindex %b.idx; fi"
+                "cd %o; bibtex %b"
+                cmd
+                cmd)))
+#+END_SRC
+  
+** LaTeX
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+
+
+  (setq-default TeX-master t)
+  (setq-default TeX-auto-save t)
+  (setq-default TeX-parse-self t)
+  ;(setq-default TeX-show-compilation t)
+  (setq-default reftex-plug-into-AUCTeX t)
+  (setq-default TeX-PDF-mode t)
+#+END_SRC
+
+** Flyspell
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (autoload 'flyspell-mode "flyspell" "On-the-fly ispell." t)
+  (setq flyspell-issue-welcome-flag nil)
+
+
+
+  (defun ispell-set-deutsch ()
+    "Switch ispell language to DAS DEUTSCHE SPRACHE!"
+    (interactive)
+    (ispell-change-dictionary "deutsch8"))
+
+  (defun ispell-set-english ()
+    "Switch ispell language to FREEDOM (⌐■_■)"
+    (interactive)
+    (ispell-change-dictionary "american"))
+
+  (defvar toggle-ispell-deutsch t)
+  (make-variable-buffer-local 'toggle-ispell-deutsch)
+
+  (defun toggle-ispell-deutsch ()
+    "Toggle ispell-language between english and deutsch8"
+    (interactive)
+    (cond 
+      (toggle-ispell-deutsch
+        (setq is-ispell-deutsch nil)
+        (ispell-set-deutsch))
+      (t
+        (setq toggle-ispell-deutsch t)
+        (ispell-set-english))))
+
+  (add-hook 'post-mode-hook
+    '(lambda ()
+      (flyspell-mode t)
+      (setq flyspell-generic-check-word-p 'mail-mode-flyspell-verify)))
+
+#+END_SRC
+
+* Programming
+** Prog
+   #+BEGIN_SRC emacs-lisp
+     ;; show unncessary whitespace that can mess up your diff
+     ;(add-hook 'prog-mode-hook
+     ;          (lambda () (interactive) (setq show-trailing-whitespace 1)))
+     (add-hook 'c-mode-hook 'lsp)
+     (add-hook 'c++-mode-hook 'lsp)
+
+     ;; GDB
+     (setq gdb-many-windows t
+           gdb-show-main t)
+
+     (require 'helm-xref)
+     (define-key global-map [remap find-file] #'helm-find-files)
+     (define-key global-map [remap execute-extended-command] #'helm-M-x)
+     (define-key global-map [remap switch-to-buffer] #'helm-mini)
+
+     (setq treemacs-space-between-root-nodes nil
+           company-idle-delay 0.0
+           company-minimum-prefix-length 1
+           lsp-idle-delay 0.1)  ;; clangd is fast
+
+     (setq lsp-keymap-prefix "C-c l")
+     (with-eval-after-load 'lsp-mode
+         (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+         (require 'dap-cpptools)
+         (yas-global-mode)
+         (global-flycheck-mode)
+         (lsp-ui-mode))
+
+     (setq lsp-ui-doc-enable t
+           lsp-ui-peek-enable t
+           lsp-ui-sideline-enable t
+           lsp-ui-imenu-enable t
+           lsp-ui-flycheck-enable t)
+
+     (setq-default c-default-style "linux"
+                   c-basic-offset 4)
+
+     (require 'fold-this)
+     (global-set-key (kbd "C-c C-f") 'fold-this-all)
+     (global-set-key (kbd "C-c C-F") 'fold-this)
+     (global-set-key (kbd "C-c M-f") 'fold-this-unfold-all)
+
+   #+END_SRC
+** Haskell
+   #+BEGIN_SRC emacs-lisp
+     (defun haskell-hook ()
+       (haskell-indentation-mode)
+       (interactive-haskell-mode)
+       ;(defvar haskell-font-lock-symbols)
+       ;(setq haskell-font-lock-symbols t)
+       ;(haskell-unicode-input-method-enable) 
+       ;(turn-on-haskell-font-lock)
+       )
+
+     (add-hook 'haskell-mode-hook
+               (lambda ()
+                 (flyspell-prog-mode)
+                 (haskell-hook)))
+
+
+     ;(add-hook 'haskell-mode-hook 'haskell-hook)
+   #+END_SRC
+** Clojure
+   #+BEGIN_SRC emacs-lisp      
+     (add-hook 'cider-repl-mode-hook #'paredit-mode)
+     (add-hook 'cider-mode-hook #'paredit-mode)
+     (add-hook 'cider-repl-mode-hook #'company-mode)
+     (add-hook 'cider-mode-hook #'company-mode)
+     (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+     (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+   #+END_SRC
