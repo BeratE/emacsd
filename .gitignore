@@ -9,6 +9,7 @@ tramp
 .\#*
 session*
 .lsp*
+/transient
 
 # Other directories
 .extension/

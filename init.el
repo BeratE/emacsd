@@ -24,7 +24,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(paredit cider clojure-mode fold-this cmake-mode treemacs-projectile dap-mode helm-xref projectile helm-lsp yasnippet ggtags sr-speedbar company-irony-c-headers company-c-headers company lsp-treemacs helm org-special-block-extras flycheck auctex lsp-haskell lsp-ui lsp-mode which-key use-package))
+   '(magit paredit cider clojure-mode fold-this cmake-mode treemacs-projectile dap-mode helm-xref projectile helm-lsp yasnippet ggtags sr-speedbar company-irony-c-headers company-c-headers company lsp-treemacs helm org-special-block-extras flycheck auctex lsp-haskell lsp-ui lsp-mode which-key use-package))
  '(safe-local-variable-values '((TeX-command-extra-options . "-shell-escape")))
  '(show-trailing-whitespace nil))
 (custom-set-faces

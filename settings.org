@@ -220,75 +220,80 @@ Handy if you forget the specific keybindings. You only need to remember the mode
 
 * Programming
 ** Prog
-   #+BEGIN_SRC emacs-lisp
-     ;; show unncessary whitespace that can mess up your diff
-     ;(add-hook 'prog-mode-hook
-     ;          (lambda () (interactive) (setq show-trailing-whitespace 1)))
-     (add-hook 'c-mode-hook 'lsp)
-     (add-hook 'c++-mode-hook 'lsp)
 
-     ;; GDB
-     (setq gdb-many-windows t
-           gdb-show-main t)
+#+BEGIN_SRC emacs-lisp
+  ;; show unncessary whitespace that can mess up your diff
+  ;(add-hook 'prog-mode-hook
+  ;          (lambda () (interactive) (setq show-trailing-whitespace 1)))
+  (add-hook 'c-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
 
-     (require 'helm-xref)
-     (define-key global-map [remap find-file] #'helm-find-files)
-     (define-key global-map [remap execute-extended-command] #'helm-M-x)
-     (define-key global-map [remap switch-to-buffer] #'helm-mini)
+  ;; GDB
+  (setq gdb-many-windows t
+        gdb-show-main t)
 
-     (setq treemacs-space-between-root-nodes nil
-           company-idle-delay 0.0
-           company-minimum-prefix-length 1
-           lsp-idle-delay 0.1)  ;; clangd is fast
+  (require 'helm-xref)
+  (define-key global-map [remap find-file] #'helm-find-files)
+  (define-key global-map [remap execute-extended-command] #'helm-M-x)
+  (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
-     (setq lsp-keymap-prefix "C-c l")
-     (with-eval-after-load 'lsp-mode
-         (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-         (require 'dap-cpptools)
-         (yas-global-mode)
-         (global-flycheck-mode)
-         (lsp-ui-mode))
+  (setq treemacs-space-between-root-nodes nil
+        company-idle-delay 0.0
+        company-minimum-prefix-length 1
+        lsp-idle-delay 0.1)  ;; clangd is fast
 
-     (setq lsp-ui-doc-enable t
-           lsp-ui-peek-enable t
-           lsp-ui-sideline-enable t
-           lsp-ui-imenu-enable t
-           lsp-ui-flycheck-enable t)
+  (setq lsp-keymap-prefix "C-c l")
+  (with-eval-after-load 'lsp-mode
+      (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+      (require 'dap-cpptools)
+      (yas-global-mode)
+      (global-flycheck-mode)
+      (lsp-ui-mode))
 
-     (setq-default c-default-style "linux"
-                   c-basic-offset 4)
+  (setq lsp-ui-doc-enable t
+        lsp-ui-peek-enable t
+        lsp-ui-sideline-enable t
+        lsp-ui-imenu-enable t
+        lsp-ui-flycheck-enable t)
 
-     (require 'fold-this)
-     (global-set-key (kbd "C-c C-f") 'fold-this-all)
-     (global-set-key (kbd "C-c C-F") 'fold-this)
-     (global-set-key (kbd "C-c M-f") 'fold-this-unfold-all)
+  (setq-default c-default-style "linux"
+                c-basic-offset 4)
 
-   #+END_SRC
+  (require 'fold-this)
+  (global-set-key (kbd "C-c C-f") 'fold-this-all)
+  (global-set-key (kbd "C-c C-F") 'fold-this)
+  (global-set-key (kbd "C-c M-f") 'fold-this-unfold-all)
+
+#+END_SRC
+
 ** Haskell
-   #+BEGIN_SRC emacs-lisp
-     (defun haskell-hook ()
-       (haskell-indentation-mode)
-       (interactive-haskell-mode)
-       ;(defvar haskell-font-lock-symbols)
-       ;(setq haskell-font-lock-symbols t)
-       ;(haskell-unicode-input-method-enable) 
-       ;(turn-on-haskell-font-lock)
-       )
 
-     (add-hook 'haskell-mode-hook
-               (lambda ()
-                 (flyspell-prog-mode)
-                 (haskell-hook)))
+#+BEGIN_SRC emacs-lisp
+  (defun haskell-hook ()
+    (haskell-indentation-mode)
+    (interactive-haskell-mode)
+    ;(defvar haskell-font-lock-symbols)
+    ;(setq haskell-font-lock-symbols t)
+    ;(haskell-unicode-input-method-enable) 
+    ;(turn-on-haskell-font-lock)
+    )
+
+  (add-hook 'haskell-mode-hook
+            (lambda ()
+              (flyspell-prog-mode)
+              (haskell-hook)))
 
 
-     ;(add-hook 'haskell-mode-hook 'haskell-hook)
-   #+END_SRC
+  ;(add-hook 'haskell-mode-hook 'haskell-hook)
+#+END_SRC
+
 ** Clojure
-   #+BEGIN_SRC emacs-lisp      
-     (add-hook 'cider-repl-mode-hook #'paredit-mode)
-     (add-hook 'cider-mode-hook #'paredit-mode)
-     (add-hook 'cider-repl-mode-hook #'company-mode)
-     (add-hook 'cider-mode-hook #'company-mode)
-     (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
-     (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
-   #+END_SRC
+
+#+BEGIN_SRC emacs-lisp      
+  (add-hook 'cider-repl-mode-hook #'paredit-mode)
+  (add-hook 'cider-mode-hook #'paredit-mode)
+  (add-hook 'cider-repl-mode-hook #'company-mode)
+  (add-hook 'cider-mode-hook #'company-mode)
+  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+#+END_SRC
