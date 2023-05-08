@@ -34,7 +34,8 @@ Lets have some sane defaults, shall we?
   (prefer-coding-system 'utf-8)
   
   (setq-default indent-tabs-mode nil
-                indicate-empty-lines t)
+                indicate-empty-lines t
+                tab-width 4)
   
   ;; Enable Minor Modes
   (ido-mode 1)
@@ -47,9 +48,6 @@ Lets have some sane defaults, shall we?
   (column-number-mode t)
   (delete-selection-mode t)
   (global-visual-line-mode)
-  
-  (setq-default indent-tabs-mode nil
-                tab-width 4)
   
   ;; Global Keys
   (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -101,6 +99,39 @@ Handy if you forget the specific keybindings. You only need to remember the mode
     :ensure t
     :config
     (which-key-mode))
+#+END_SRC  
+
+** Company
+
+#+BEGIN_SRC emacs-lisp
+  (require 'company)
+  (global-company-mode)
+  (setq 
+    tab-always-indent 'complete
+    company-idle-delay 0.1
+    company-selection-wrap-around t
+    company-tooltip-align-annotations t
+    company-idle-delay 0.36
+    company-minimum-prefix-length 2
+    company-tooltip-limit 10)
+
+  ;(use-package company-quickhelp
+  ;  :ensure t
+  ;  :config
+  ;  ;; Load company-quickhelp globally:
+  ;  (company-quickhelp-mode)
+  ;  ;; Time before display of documentation popup:
+  ;  (setq company-quickhelp-delay 0.3))
+#+END_SRC  
+
+** Flycheck
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+
 #+END_SRC  
 
 * Text Editing
@@ -185,8 +216,6 @@ Handy if you forget the specific keybindings. You only need to remember the mode
   (add-hook 'text-mode-hook 'flyspell-mode)
   (autoload 'flyspell-mode "flyspell" "On-the-fly ispell." t)
   (setq flyspell-issue-welcome-flag nil)
-
-
 
   (defun ispell-set-deutsch ()
     "Switch ispell language to DAS DEUTSCHE SPRACHE!"
@@ -297,4 +326,34 @@ Handy if you forget the specific keybindings. You only need to remember the mode
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+#+END_SRC
+
+** R
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ess
+    :config
+    (setq inferior-ess-r-program "/usr/bin/R")
+    (setq ess-use-company 'script-only)
+    (setq ess-use-flymake nil)
+    (add-to-list 'auto-mode-alist '("\\.R\\'" . r-mode)))
+
+  (with-eval-after-load 'ess
+    (setq ess-use-company t))
+
+  ;; Font highlighting
+  (setq ess-R-font-lock-keywords
+  '((ess-R-fl-keyword:keywords . t)
+    (ess-R-fl-keyword:constants . t)
+	(ess-R-fl-keyword:modifiers . t)
+	(ess-R-fl-keyword:fun-defs . t)
+	(ess-R-fl-keyword:assign-ops . t)
+	(ess-R-fl-keyword:%op% . t)
+	(ess-fl-keyword:fun-calls . t)
+	(ess-fl-keyword:numbers . t)
+	(ess-fl-keyword:operators)
+	(ess-fl-keyword:delimiters)
+	(ess-fl-keyword:=)
+	(ess-R-fl-keyword:F&T . t)))
+
 #+END_SRC

@@ -8,10 +8,17 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 (package-initialize)
 
-(require 'use-package)
+;; Make sure that use-package is installed:
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+;; Load use-package:
+(eval-when-compile
+  (require 'use-package))
 
 ;; Load Configuration file
 (require 'org)
 (org-babel-load-file
  (expand-file-name "settings.org"
 		   user-emacs-directory))
+(put 'downcase-region 'disabled nil)
