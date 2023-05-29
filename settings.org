@@ -357,3 +357,17 @@ Handy if you forget the specific keybindings. You only need to remember the mode
 	(ess-R-fl-keyword:F&T . t)))
 
 #+END_SRC
+** Python
+
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable)
+    :config 
+    (setq elpy-rpc-python-command "python3"))
+
+  (when (load "flycheck" t t)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode))
+#+END_SRC
