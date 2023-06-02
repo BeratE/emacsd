@@ -1,6 +1,6 @@
 #+title:  Emacs configuration file
 #+author: Berat Ertural
-#+date:   2021-08-06
+#+date:   2023-02-06
 
 * Custom Look and Feel 
 ** Personal Information
@@ -11,7 +11,7 @@ This is me!
         user-mail-address "beertural+git@gmail.com")
 #+END_SRC
 
-** Default Behaviour
+** Default Behavior
 Lets have some sane defaults, shall we?
 
 #+BEGIN_SRC emacs-lisp
@@ -57,9 +57,11 @@ Lets have some sane defaults, shall we?
   
 ** Style
 *** Theme 
-Tango-dark is comfy. 
+Looking smart
 
 #+BEGIN_SRC emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
   ;(load-theme 'tango-dark t)
   (load-theme 'flatland t)
 #+END_SRC
@@ -103,28 +105,37 @@ Handy if you forget the specific keybindings. You only need to remember the mode
 
 ** Company
 
-#+BEGIN_SRC emacs-lisp
-  (require 'company)
-  (global-company-mode)
-  (setq 
-    tab-always-indent 'complete
-    company-idle-delay 0.1
-    company-selection-wrap-around t
-    company-tooltip-align-annotations t
-    company-idle-delay 0.36
-    company-minimum-prefix-length 2
-    company-tooltip-limit 10)
+Auto completion and help
 
-  ;(use-package company-quickhelp
-  ;  :ensure t
-  ;  :config
-  ;  ;; Load company-quickhelp globally:
-  ;  (company-quickhelp-mode)
-  ;  ;; Time before display of documentation popup:
-  ;  (setq company-quickhelp-delay 0.3))
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :bind (:map company-active-map
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous))
+    :config
+      (setq tab-always-indent 'complete
+        company-idle-delay 0.3
+        company-selection-wrap-around t
+        company-tooltip-align-annotations t
+        company-idle-delay 0.36
+        company-minimum-prefix-length 2
+        company-tooltip-limit 10)
+      (global-company-mode t))
+
+  (use-package company-quickhelp
+    :ensure t
+    :config
+      (company-quickhelp-mode)
+      (setq company-quickhelp-delay 0.3))
+
+
+  (eval-after-load 'company
+    '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
 #+END_SRC  
 
 ** Flycheck
+
+Syntax checking
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -210,7 +221,18 @@ Handy if you forget the specific keybindings. You only need to remember the mode
   (setq-default TeX-PDF-mode t)
 #+END_SRC
 
+** Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown"))
+#+END_SRC
+
 ** Flyspell
+
+Check your grammar.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'text-mode-hook 'flyspell-mode)
@@ -248,8 +270,14 @@ Handy if you forget the specific keybindings. You only need to remember the mode
 
 #+END_SRC
 
+** Treemacs
+...
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
 * Programming
-** Prog
+** General
 
 #+BEGIN_SRC emacs-lisp
   ;; show unncessary whitespace that can mess up your diff
@@ -328,7 +356,7 @@ Handy if you forget the specific keybindings. You only need to remember the mode
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
 #+END_SRC
 
-** R
+** R with ESS
 
 #+BEGIN_SRC emacs-lisp
   (use-package ess
