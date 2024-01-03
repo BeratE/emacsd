@@ -1,6 +1,6 @@
 #+title:  Emacs configuration file
 #+author: Berat Ertural
-#+date:   2023-02-06
+#+date:   2024-01-03
 
 * Custom Look and Feel 
 ** Personal Information
@@ -41,6 +41,7 @@ Lets have some sane defaults, shall we?
   (ido-mode 1)
   (ido-everywhere)
   (setq ido-enable-flex-matching t)
+  ;(setq inhibit-startup-screen t)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (show-paren-mode t)
@@ -53,6 +54,7 @@ Lets have some sane defaults, shall we?
   (global-set-key (kbd "C-x C-b") 'ibuffer)
   (global-set-key (kbd "C-c w") 'whitespace-mode)
   (global-set-key (kbd "RET") 'newline-and-indent)
+
 #+END_SRC
   
 ** Style
@@ -149,6 +151,7 @@ Syntax checking
 ** Custom 
 
 #+BEGIN_SRC emacs-lisp
+
   (defun increment-number-at-point ()
     (interactive)
     (skip-chars-backward "0-9")
@@ -162,6 +165,7 @@ Syntax checking
 
 ** Outline
 #+BEGIN_SRC emacs-lisp
+
   ; Outline-minor-mode key map
   (define-prefix-command 'cm-map nil "Outline-")
                                           ; HIDE
@@ -184,7 +188,9 @@ Syntax checking
   (define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same level
   (define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same level
   (global-set-key "\M-o" cm-map)
+
 #+END_SRC  
+
 ** Org-mode
 
 #+BEGIN_SRC emacs-lisp
@@ -219,12 +225,17 @@ Syntax checking
   ;(setq-default TeX-show-compilation t)
   (setq-default reftex-plug-into-AUCTeX t)
   (setq-default TeX-PDF-mode t)
+
+  (require 'openwith)
+  (openwith-mode t)
+  (setq openwith-associations '(("\\.pdf\\'" "evince" (file))))
 #+END_SRC
 
 ** Markdown
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
+    :defer 1
     :ensure t
     :mode ("README\\.md\\'" . gfm-mode)
     :init (setq markdown-command "multimarkdown"))
@@ -273,33 +284,42 @@ Check your grammar.
 ** Treemacs
 ...
 #+BEGIN_SRC emacs-lisp
-
+  (add-hook 'emacs-startup-hook 'treemacs)
 #+END_SRC
 
 * Programming
 ** General
 
 #+BEGIN_SRC emacs-lisp
-  ;; show unncessary whitespace that can mess up your diff
-  ;(add-hook 'prog-mode-hook
-  ;          (lambda () (interactive) (setq show-trailing-whitespace 1)))
+
+  ;; Show unncessary whitespace that can mess up your diff
+  (add-hook 'prog-mode-hook
+            (lambda () (interactive) (setq show-trailing-whitespace 1)))
+
+  ;; C/C++
   (add-hook 'c-mode-hook 'lsp)
   (add-hook 'c++-mode-hook 'lsp)
+
+  (setq-default c-default-style "linux"
+                c-basic-offset 4)
 
   ;; GDB
   (setq gdb-many-windows t
         gdb-show-main t)
 
+  ;; Helm
   (require 'helm-xref)
   (define-key global-map [remap find-file] #'helm-find-files)
   (define-key global-map [remap execute-extended-command] #'helm-M-x)
   (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
+  ;; Treemacs
   (setq treemacs-space-between-root-nodes nil
         company-idle-delay 0.0
         company-minimum-prefix-length 1
         lsp-idle-delay 0.1)  ;; clangd is fast
 
+  ;; LSP
   (setq lsp-keymap-prefix "C-c l")
   (with-eval-after-load 'lsp-mode
       (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
@@ -314,8 +334,6 @@ Check your grammar.
         lsp-ui-imenu-enable t
         lsp-ui-flycheck-enable t)
 
-  (setq-default c-default-style "linux"
-                c-basic-offset 4)
 
   (require 'fold-this)
   (global-set-key (kbd "C-c C-f") 'fold-this-all)
@@ -360,6 +378,7 @@ Check your grammar.
 
 #+BEGIN_SRC emacs-lisp
   (use-package ess
+    :defer 1
     :config
     (setq inferior-ess-r-program "/usr/bin/R")
     (setq ess-use-company 'script-only)
@@ -389,6 +408,7 @@ Check your grammar.
 
 #+BEGIN_SRC emacs-lisp
   (use-package elpy
+    :defer 1
     :ensure t
     :init
     (elpy-enable)
@@ -398,4 +418,16 @@ Check your grammar.
   (when (load "flycheck" t t)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (add-hook 'elpy-mode-hook 'flycheck-mode))
+#+END_SRC
+
+** Lua
+
+#+BEGIN_SRC emacs-lisp
+  (use-package lua-mode
+    :defer 1
+    :ensure t 
+    :config 
+    (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
 #+END_SRC

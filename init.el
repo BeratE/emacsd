@@ -29,7 +29,7 @@
  ;; If there is more than one, they won't work right.
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(company-quickhelp elpy python-mode treemacs ess cmake-mode which-key use-package helm-xref fold-this flycheck flatland-theme company)))
+   '(company-lua lua-mode openwith json-mode company-quickhelp elpy python-mode treemacs ess cmake-mode which-key use-package helm-xref fold-this flycheck flatland-theme company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
